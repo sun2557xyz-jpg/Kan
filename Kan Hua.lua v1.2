@@ -1,0 +1,54 @@
+-- =====================================================
+--  LOAD MACLIB UI LIBRARY
+-- =====================================================
+local Maclib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodboof/Maclib/main/library.lua"))()
+local Window = Maclib:Window({
+    Title = "Galaxy System Hub",
+    Subtitle = "PvP & Utility Suite",
+    Size = UDim2.fromOffset(600, 450),
+    Dragable = true
+})
+
+-- =====================================================
+--  ANTI-BAN / ANTI-DETECTION LAYER (ระบบกันแบนเบื้องต้น)
+-- =====================================================
+local function InitAntiCheatBypass()
+    local gmt = getrawmetatable(game)
+    setreadonly(gmt, false)
+    local oldNamecall = gmt.__namecall
+    
+    gmt.__namecall = newcclosure(function(self, ...)
+        local method = getnamecallmethod()
+        -- บล็อกการส่ง Signal ตรวจจับจาก Client ไปยัง Server (Hook/Ban Events)
+        if method == "FireServer" and tostring(self):lower():find("ban") then
+            return nil
+        end
+        return oldNamecall(self, ...)
+    end)
+    setreadonly(gmt, true)
+end
+pcall(InitAntiCheatBypass)
+
+-- =====================================================
+--  SERVICES & VARIABLES
+-- =====================================================
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local SpawnGalaxyBlock = ReplicatedStorage:WaitForChild("SpawnGalaxyBlock")
+
+-- สถานะการเปิด/ปิด ของแต่ละฟังก์ชัน (States)
+local Toggles = {
+    AimbotWallbang = false,
+    FovCircle = false,
+    InfSpeedJump = false,
+    AutoRequest = false,
+    AntiLockSpin = false,
+    ESP = false,
+    ItemMagnetUnderground = false,
+    SkyFlySpinOnKnock = false,
+    FastShoot = false,
+    TracerLines = false,
+    FastSell = false,
+    FastRoll = false,
+    
